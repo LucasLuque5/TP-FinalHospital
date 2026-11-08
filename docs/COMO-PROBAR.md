@@ -227,7 +227,15 @@ npm run db:crear      # deja la base limpia otra vez
 
 Las dos deben terminar con `Tests 23 passed (23)`.
 
-## 8. Mirar la base de datos
+## 8. Documentación de la API (Swagger)
+
+Con el backend corriendo, abrir **http://localhost:3000/api/docs**. Lista todas las rutas
+agrupadas por módulo, con los datos que esperan.
+
+Para probar una ruta protegida: ejecutar `POST /iam/login` con un usuario de prueba, copiar
+el `token` de la respuesta, pulsar **Authorize** y pegarlo.
+
+## 9. Mirar la base de datos
 
 En SSMS, sobre `HospitalDB`:
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useSesionStore } from '@/modules/iam/stores/sesion';
 import { useNotificacionesStore } from '@/shared/stores/notificaciones';
 
@@ -9,8 +9,14 @@ import { useNotificacionesStore } from '@/shared/stores/notificaciones';
  * rutas del router y mostrando solo las que el rol del usuario puede usar.
  */
 const router = useRouter();
+const ruta = useRoute();
 const sesion = useSesionStore();
 const notificaciones = useNotificacionesStore();
+
+// En pantallas chicas (celular) el menú se pliega y se abre con un botón.
+const menuAbierto = ref(false);
+// Al elegir una pantalla, el menú se vuelve a cerrar solo.
+watch(() => ruta.fullPath, () => (menuAbierto.value = false));
 
 const grupos = computed(() => {
   const resultado = new Map<string, { titulo: string; ruta: string }[]>();
@@ -33,9 +39,19 @@ function salir() {
 
 <template>
   <aside class="barra">
-    <div class="marca">Hospital<span>HIS</span></div>
+    <div class="cabecera">
+      <div class="marca">Hospital<span>HIS</span></div>
+      <button
+        class="boton-menu secundario chico"
+        :aria-expanded="menuAbierto"
+        aria-controls="menu-principal"
+        @click="menuAbierto = !menuAbierto"
+      >
+        {{ menuAbierto ? 'Cerrar' : 'Menú' }}
+      </button>
+    </div>
 
-    <nav aria-label="Menú principal">
+    <nav id="menu-principal" aria-label="Menú principal" :class="{ abierto: menuAbierto }">
       <section v-for="[grupo, enlaces] in grupos" :key="grupo">
         <h3>{{ grupo }}</h3>
         <RouterLink v-for="enlace in enlaces" :key="enlace.ruta" :to="enlace.ruta">
@@ -44,7 +60,7 @@ function salir() {
       </section>
     </nav>
 
-    <div class="usuario">
+    <div class="usuario" :class="{ abierto: menuAbierto }">
       <strong>{{ sesion.usuario?.nombreCompleto }}</strong>
       <span>{{ sesion.usuario?.rol }}</span>
       <button class="secundario chico" @click="salir">Cerrar sesión</button>
@@ -110,9 +126,36 @@ a.router-link-active {
   color: #8fb0bf;
   margin-bottom: 6px;
 }
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.boton-menu {
+  display: none;
+}
+/* Celulares: barra arriba, menú plegado detrás del botón "Menú". */
 @media (max-width: 800px) {
   .barra {
     width: 100%;
+    padding: 12px 16px;
+  }
+  .marca {
+    padding: 0;
+  }
+  .boton-menu {
+    display: inline-block;
+  }
+  nav,
+  .usuario {
+    display: none;
+  }
+  nav.abierto,
+  .usuario.abierto {
+    display: block;
+  }
+  .usuario.abierto {
+    display: grid;
   }
 }
 </style>

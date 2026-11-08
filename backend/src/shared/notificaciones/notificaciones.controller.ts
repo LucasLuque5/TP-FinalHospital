@@ -1,9 +1,11 @@
 import { Controller, Get, Sse } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { Usuario } from '../../iam/decorators/usuario.decorator.js';
 import type { UsuarioActual } from '../../iam/usuario-actual.js';
 import { NotificacionesService } from './notificaciones.service.js';
 
+@ApiTags('Notificaciones')
 @Controller('notificaciones')
 export class NotificacionesController {
   constructor(private readonly servicio: NotificacionesService) {}

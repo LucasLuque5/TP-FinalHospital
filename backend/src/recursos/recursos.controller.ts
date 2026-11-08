@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator.js';
 import { Usuario } from '../iam/decorators/usuario.decorator.js';
 import { NombreRol, type UsuarioActual } from '../iam/usuario-actual.js';
@@ -16,6 +17,7 @@ const { Administrador, Recepcionista, Medico, Enfermero } = NombreRol;
  *   "personal de maestranza"   -> Recepcionista / Enfermero / Administrador
  *   "gestor de inventario"     -> Administrador
  */
+@ApiTags('Recursos y camas')
 @Controller('recursos')
 export class RecursosController {
   constructor(

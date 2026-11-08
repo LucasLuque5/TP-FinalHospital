@@ -5,6 +5,7 @@ import { useSesionStore } from '@/modules/iam/stores/sesion';
 import EtiquetaEstado from '@/shared/components/EtiquetaEstado.vue';
 import MensajeEstado from '@/shared/components/MensajeEstado.vue';
 import SelectorPaciente from '@/shared/components/SelectorPaciente.vue';
+import TarjetaSeccion from '@/shared/components/TarjetaSeccion.vue';
 import { useAccion, useMonitor } from '@/shared/composables/useAccion';
 import type { EnListaEspera, Turno, Usuario } from '@/shared/tipos';
 import { hora, hoy, nombreCompleto } from '@/shared/utils/formato';
@@ -196,33 +197,44 @@ const horaFin = (turno: Turno) =>
     </table>
   </section>
 
+  <!-- Las tres tarjetas usan el mismo componente con slots (TarjetaSeccion). -->
   <div v-if="esAdmision" class="grilla">
-    <section class="tarjeta">
-      <h2>Lista de espera del día</h2>
-      <p class="subtitulo">Si se cancela un turno, se asigna solo al primero de esta lista.</p>
+    <TarjetaSeccion
+      titulo="Lista de espera del día"
+      descripcion="Si se cancela un turno, se asigna solo al primero de esta lista."
+    >
+      <template #encabezado>
+        <span class="etiqueta azul">{{ espera.length }} en espera</span>
+      </template>
+
       <ol v-if="espera.length > 0">
         <li v-for="item in espera" :key="item.id">{{ nombreCompleto(item.paciente) }}</li>
       </ol>
       <p v-else class="vacio">No hay pacientes en espera.</p>
-      <button class="secundario" :disabled="cargando" @click="agregarAEspera">
-        Agregar al paciente seleccionado
-      </button>
-    </section>
 
-    <section class="tarjeta">
-      <h2>Insertar entreturno</h2>
-      <p class="subtitulo">Divide un turno existente para atender una urgencia menor.</p>
+      <template #pie>
+        <button class="secundario" :disabled="cargando" @click="agregarAEspera">
+          Agregar al paciente seleccionado
+        </button>
+      </template>
+    </TarjetaSeccion>
+
+    <TarjetaSeccion
+      titulo="Insertar entreturno"
+      descripcion="Divide un turno existente para atender una urgencia menor."
+    >
       <form class="formulario" @submit.prevent="insertarEntreturno">
         <label>Hora del entreturno <input v-model="horaEntreturno" type="time" required /></label>
         <button type="submit" class="secundario" :disabled="cargando">
           Insertar para el paciente seleccionado
         </button>
       </form>
-    </section>
+    </TarjetaSeccion>
 
-    <section class="tarjeta">
-      <h2>Generar agenda</h2>
-      <p class="subtitulo">Crea los turnos disponibles del médico para la fecha elegida.</p>
+    <TarjetaSeccion
+      titulo="Generar agenda"
+      descripcion="Crea los turnos disponibles del médico para la fecha elegida."
+    >
       <form class="formulario" @submit.prevent="generarAgenda">
         <label>Desde <input v-model="agenda.horaInicio" type="time" required /></label>
         <label>Hasta <input v-model="agenda.horaFin" type="time" required /></label>
@@ -232,7 +244,7 @@ const horaFin = (turno: Turno) =>
         </label>
         <button type="submit" class="secundario" :disabled="cargando">Generar</button>
       </form>
-    </section>
+    </TarjetaSeccion>
   </div>
 </template>
 

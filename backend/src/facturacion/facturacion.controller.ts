@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator.js';
 import { NombreRol } from '../iam/usuario-actual.js';
 import { AsignarCoberturaDto, FacturarPrestacionDto } from './dto/facturacion.dto.js';
@@ -7,6 +8,7 @@ import { FacturacionService } from './facturacion.service.js';
 const { Administrador, Recepcionista } = NombreRol;
 
 /** El "analista de facturación" de las historias se asignó al rol Administrador. */
+@ApiTags('Facturación')
 @Controller('facturacion')
 export class FacturacionController {
   constructor(private readonly servicio: FacturacionService) {}

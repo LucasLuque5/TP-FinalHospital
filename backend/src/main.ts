@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
@@ -16,6 +17,20 @@ async function bootstrap() {
       transform: true, // convierte tipos (ej. "5" -> 5 en parámetros)
     }),
   );
+
+  // Documentación interactiva de la API (Swagger): http://localhost:3000/api/docs
+  // Lista todas las rutas agrupadas por módulo y permite probarlas desde el navegador.
+  const documentacion = new DocumentBuilder()
+    .setTitle('Hospital Information System - API')
+    .setDescription(
+      'Para probar las rutas protegidas: ejecutar POST /iam/login, copiar el "token" ' +
+        'de la respuesta y pegarlo en el botón "Authorize".',
+    )
+    .setVersion('1.0')
+    .addBearerAuth()
+    .addSecurityRequirements('bearer')
+    .build();
+  SwaggerModule.setup('api/docs', app, () => SwaggerModule.createDocument(app, documentacion));
 
   await app.listen(process.env.PORT ?? 3000);
 }

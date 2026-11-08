@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useSesionStore } from '@/modules/iam/stores/sesion';
 import MensajeEstado from '@/shared/components/MensajeEstado.vue';
+import TarjetaSeccion from '@/shared/components/TarjetaSeccion.vue';
 import { useAccion, useMonitor } from '@/shared/composables/useAccion';
 import type { Protocolo } from '@/shared/tipos';
 import { fechaHora, nombreCompleto } from '@/shared/utils/formato';
@@ -16,6 +17,9 @@ async function cargar() {
 }
 // Cuando se interna un paciente, su protocolo aparece acá sin recargar la página.
 useMonitor('protocolos', cargar);
+
+/** Cantidad de tareas ya realizadas de un protocolo. */
+const realizadas = (protocolo: Protocolo) => protocolo.tareas.filter((tarea) => tarea.completada).length;
 
 async function completar(tareaId: number) {
   await ejecutar(() => enfermeriaService.completarTarea(tareaId), 'Tarea marcada como realizada.');
@@ -38,11 +42,17 @@ async function completar(tareaId: number) {
   </p>
 
   <div class="grilla">
-    <section v-for="protocolo in protocolos" :key="protocolo.id" class="tarjeta">
-      <h2>{{ protocolo.nombre }}</h2>
-      <p class="subtitulo">
-        {{ nombreCompleto(protocolo.paciente) }} · generado el {{ fechaHora(protocolo.creadoEn) }}
-      </p>
+    <TarjetaSeccion
+      v-for="protocolo in protocolos"
+      :key="protocolo.id"
+      :titulo="protocolo.nombre"
+      :descripcion="`${nombreCompleto(protocolo.paciente)} · generado el ${fechaHora(protocolo.creadoEn)}`"
+    >
+      <template #encabezado>
+        <span class="etiqueta" :class="realizadas(protocolo) === protocolo.tareas.length ? 'verde' : 'amarillo'">
+          {{ realizadas(protocolo) }}/{{ protocolo.tareas.length }}
+        </span>
+      </template>
       <ul>
         <li v-for="tarea in protocolo.tareas" :key="tarea.id" :class="{ hecha: tarea.completada }">
           <span>{{ tarea.orden }}. {{ tarea.descripcion }}</span>
@@ -58,7 +68,7 @@ async function completar(tareaId: number) {
           <span v-else class="etiqueta amarillo">Pendiente</span>
         </li>
       </ul>
-    </section>
+    </TarjetaSeccion>
   </div>
 </template>
 

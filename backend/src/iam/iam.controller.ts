@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Publico } from './decorators/publico.decorator.js';
 import { Roles } from './decorators/roles.decorator.js';
 import { Usuario } from './decorators/usuario.decorator.js';
@@ -6,6 +7,7 @@ import { ActualizarUsuarioDto, CrearUsuarioDto, LoginDto } from './dto/iam.dto.j
 import { IamService } from './iam.service.js';
 import { NombreRol, type UsuarioActual } from './usuario-actual.js';
 
+@ApiTags('IAM - Identidad y accesos')
 @Controller('iam')
 export class IamController {
   constructor(private readonly servicio: IamService) {}

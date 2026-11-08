@@ -35,7 +35,9 @@ function alternar() {
         <span v-if="notificaciones.sinLeer > 0" class="contador">{{ notificaciones.sinLeer }}</span>
       </button>
 
-      <div v-if="abierto" class="lista tarjeta">
+      <!-- v-show y no v-if: la lista se abre y cierra seguido, así que conviene
+           dejarla en el DOM y solo ocultarla (display: none). -->
+      <div v-show="abierto" class="lista tarjeta">
         <p v-if="notificaciones.lista.length === 0" class="vacio">No hay notificaciones.</p>
         <article
           v-for="aviso in notificaciones.lista"

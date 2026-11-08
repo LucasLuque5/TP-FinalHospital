@@ -1,42 +1,39 @@
-# frontend
+# Frontend — Hospital Information System
 
-This template should help get you started developing with Vue 3 in Vite.
+Aplicación web en **Vue 3 + TypeScript**, con Vite, vue-router, Pinia y Axios.
 
-## Recommended IDE Setup
+La descripción del proyecto, la instalación completa y los usuarios de prueba están en el
+[README principal](../README.md).
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Comandos
 
-## Recommended Browser Setup
+| Comando | Qué hace |
+|---|---|
+| `npm install` | Instala las dependencias |
+| `npm run dev` | Servidor de desarrollo en http://localhost:5173 |
+| `npm run type-check` | Revisa los tipos de todo el proyecto |
+| `npm run build` | Revisa tipos y genera la versión final en `dist/` |
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+La URL del backend se puede cambiar creando un archivo `.env` con
+`VITE_API_URL=http://servidor:puerto` (por defecto, `http://localhost:3000`).
 
-## Type Support for `.vue` Imports in TS
+## Organización
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
 ```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
+src/
+├── main.ts            crea la aplicación y le conecta Pinia y el router
+├── App.vue            marco general: menú, notificaciones y <RouterView />
+├── router/            rutas de todos los módulos y guarda de navegación por rol
+├── modules/           un componente de negocio por carpeta
+│   └── <módulo>/
+│       ├── <módulo>.routes.ts
+│       ├── services/  llamadas al backend
+│       ├── components/ (opcional) piezas propias del módulo
+│       └── views/     pantallas
+└── shared/
+    ├── components/    componentes reutilizables (EtiquetaEstado, SelectorPaciente, TarjetaSeccion…)
+    ├── composables/   useAccion (carga y errores) y useMonitor (tiempo real)
+    ├── stores/        notificaciones
+    ├── services/      cliente HTTP con token y canal en vivo
+    └── utils/         formato de fechas, horas y dinero
 ```

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator.js';
 import { Usuario } from '../iam/decorators/usuario.decorator.js';
 import { NombreRol, type UsuarioActual } from '../iam/usuario-actual.js';
@@ -18,6 +19,7 @@ const PERSONAL = [
   NombreRol.Enfermero,
 ];
 
+@ApiTags('HCE - Historia clínica')
 @Controller('hce')
 export class HceController {
   constructor(private readonly servicio: HceService) {}

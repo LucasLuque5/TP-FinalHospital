@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../iam/decorators/roles.decorator.js';
 import { Usuario } from '../iam/decorators/usuario.decorator.js';
 import { NombreRol, type UsuarioActual } from '../iam/usuario-actual.js';
@@ -21,6 +22,7 @@ import { ProtocolosService } from './protocolos.service.js';
 
 const { Medico, Enfermero } = NombreRol;
 
+@ApiTags('Atención y enfermería')
 @Controller('enfermeria')
 export class EnfermeriaController {
   constructor(
