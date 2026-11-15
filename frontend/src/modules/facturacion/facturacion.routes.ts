@@ -1,17 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router';
 
-/**
- * RUTAS ANIDADAS: /facturacion es la ruta "padre" y dibuja FacturacionLayout
- * (título y pestañas). Cada ruta "hija" se dibuja DENTRO de ese layout, en
- * su <RouterView />. Las direcciones completas quedan, por ejemplo:
- *   /facturacion/obras-sociales,  /facturacion/facturas, ...
- */
 const facturacionRoutes: RouteRecordRaw[] = [
   {
     path: '/facturacion',
     name: 'facturacion',
     component: () => import('./views/FacturacionLayout.vue'),
-    redirect: { name: 'obras-sociales-list' }, // /facturacion sola abre la primera pestaña
+    redirect: { name: 'obras-sociales-list' },
     children: [
       {
         path: 'obras-sociales',

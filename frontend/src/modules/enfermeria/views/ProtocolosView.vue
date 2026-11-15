@@ -15,10 +15,8 @@ const protocolos = ref<Protocolo[]>([]);
 async function cargar() {
   protocolos.value = await enfermeriaService.listarProtocolos();
 }
-// Cuando se interna un paciente, su protocolo aparece acá sin recargar la página.
 useMonitor('protocolos', cargar);
 
-/** Cantidad de tareas ya realizadas de un protocolo. */
 const realizadas = (protocolo: Protocolo) => protocolo.tareas.filter((tarea) => tarea.completada).length;
 
 async function completar(tareaId: number) {

@@ -12,10 +12,6 @@ import {
 import { FacturacionController } from './facturacion.controller.js';
 import { FacturacionService } from './facturacion.service.js';
 
-/**
- * Notar que Facturación NO importa a Admisión, Enfermería ni Recursos:
- * se entera de lo que pasa en ellos únicamente a través de eventos.
- */
 @Module({
   imports: [
     TypeOrmModule.forFeature([

@@ -30,7 +30,6 @@ async function cargar() {
 onMounted(cargar);
 
 async function registrar() {
-  // Los campos opcionales que quedaron vacíos no se envían.
   const datos = Object.fromEntries(Object.entries(nuevo).filter(([, valor]) => valor !== ''));
   const creado = await ejecutar(() => hceService.registrarPaciente(datos), 'Paciente registrado.');
   if (creado) {

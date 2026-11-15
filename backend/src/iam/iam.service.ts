@@ -22,17 +22,14 @@ export class IamService {
     private readonly jwt: JwtService,
   ) {}
 
-  /** Verifica usuario y contraseña. Si son correctos, entrega un token JWT. */
   async login(dto: LoginDto): Promise<{ token: string; usuario: UsuarioActual }> {
     const usuario = await this.usuarios
       .createQueryBuilder('u')
-      .addSelect('u.passwordHash') // la columna está oculta por defecto
+      .addSelect('u.passwordHash')
       .leftJoinAndSelect('u.rol', 'rol')
       .where('u.nombreUsuario = :nombre', { nombre: dto.nombreUsuario })
       .getOne();
 
-    // Mismo mensaje para "no existe" y "contraseña incorrecta":
-    // así no se le da pistas a quien intenta adivinar usuarios.
     const credencialesValidas =
       usuario !== null && (await bcrypt.compare(dto.password, usuario.passwordHash));
     if (!usuario || !credencialesValidas) {
@@ -60,7 +57,6 @@ export class IamService {
     return this.usuarios.find({ order: { apellido: 'ASC', nombre: 'ASC' } });
   }
 
-  /** Lo usan las pantallas de turnos para elegir de qué médico es la agenda. */
   listarMedicos(): Promise<Usuario[]> {
     return this.usuarios.find({
       where: { rol: { nombre: NombreRol.Medico }, activo: true },
@@ -68,7 +64,6 @@ export class IamService {
     });
   }
 
-  /** Lo usan otros módulos para validar que un ID corresponde a un médico activo. */
   async obtenerMedico(id: number): Promise<Usuario> {
     const medico = await this.usuarios.findOneBy({ id, activo: true });
     if (!medico || medico.rol.nombre !== NombreRol.Medico) {
@@ -89,7 +84,6 @@ export class IamService {
     const guardado = await this.usuarios.save(
       this.usuarios.create({
         nombreUsuario: dto.nombreUsuario,
-        // Nunca se guarda la contraseña: se guarda un hash que no se puede revertir.
         passwordHash: await bcrypt.hash(dto.password, 10),
         nombre: dto.nombre,
         apellido: dto.apellido,
@@ -101,7 +95,6 @@ export class IamService {
     return this.buscarUsuario(guardado.id);
   }
 
-  /** Gestión de roles: cambiar el rol de un usuario o activarlo/desactivarlo. */
   async actualizarUsuario(id: number, dto: ActualizarUsuarioDto): Promise<Usuario> {
     const usuario = await this.buscarUsuario(id);
     if (dto.rolId !== undefined) usuario.rol = await this.buscarRol(dto.rolId);

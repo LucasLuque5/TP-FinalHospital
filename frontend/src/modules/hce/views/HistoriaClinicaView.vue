@@ -10,7 +10,6 @@ import type { HistoriaClinica, NotaEnfermeria, SignoVital } from '@/shared/tipos
 import { fecha, fechaHora } from '@/shared/utils/formato';
 import { hceService } from '../services/hce.service';
 
-// El ID del paciente viene en la dirección: /hce/pacientes/:id/historia
 const pacienteId = Number(useRoute().params.id);
 const sesion = useSesionStore();
 const { error, exito, cargando, ejecutar } = useAccion();
@@ -24,7 +23,6 @@ const antecedente = reactive({ parentesco: '', enfermedad: '' });
 const evolucion = ref('');
 
 async function cargar() {
-  // Las tres consultas se hacen en paralelo.
   [historia.value, signos.value, notas.value] = await Promise.all([
     hceService.obtenerHistoria(pacienteId),
     enfermeriaService.listarSignos(pacienteId),
@@ -35,7 +33,7 @@ onMounted(() => ejecutar(cargar));
 
 async function guardar(accion: () => Promise<void>, mensaje: string, limpiar: () => void) {
   await ejecutar(accion, mensaje);
-  if (error.value) return; // si falló, se deja el formulario como estaba
+  if (error.value) return;
   limpiar();
   await cargar();
 }

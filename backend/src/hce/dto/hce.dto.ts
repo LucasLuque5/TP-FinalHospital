@@ -45,7 +45,6 @@ export class CrearPacienteDto {
   direccion?: string;
 }
 
-/** Datos de contacto que se pueden corregir después del registro. */
 export class ActualizarPacienteDto {
   @IsOptional()
   @IsString()

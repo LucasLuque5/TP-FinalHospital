@@ -12,7 +12,6 @@ const hceRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    // ":id" es un parámetro: /hce/pacientes/3/historia abre la historia del paciente 3.
     path: '/hce/pacientes/:id/historia',
     name: 'historia-clinica',
     component: () => import('./views/HistoriaClinicaView.vue'),

@@ -13,10 +13,9 @@ import { TurnosService } from './turnos.service.js';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Turno, ListaEspera, Triaje]),
-    // Componentes de los que depende Admisión:
-    HceModule, // para validar pacientes
-    IamModule, // para validar médicos
-    NotificacionesModule, // para alertar a recepción y a los médicos
+    HceModule,
+    IamModule,
+    NotificacionesModule,
   ],
   controllers: [AdmisionController],
   providers: [TurnosService, TriajeService],

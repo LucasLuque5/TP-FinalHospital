@@ -1,25 +1,8 @@
-/**
- * PATRÓN BUILDER (Constructor) - Épica 2 de Enfermería
- * ------------------------------------------------------------------
- * Problema: el "plan de cuidados" inicial de un paciente cambia mucho
- * según por qué ingresa. Armarlo con if/else mezclaría todos los
- * protocolos en un mismo lugar.
- *
- * Solución: el protocolo se arma PASO A PASO. Hay tres piezas:
- *   1. Producto  -> ProtocoloAtencion: lo que se quiere construir.
- *   2. Builder   -> ProtocoloBuilder: define los pasos de construcción.
- *                   Cada tipo de ingreso tiene su builder concreto.
- *   3. Director  -> DirectorDeProtocolos: sabe en qué ORDEN llamar a los
- *                   pasos, pero no qué tareas agrega cada uno.
- */
-
-/** PRODUCTO: el protocolo de atención ya armado. */
 export class ProtocoloAtencion {
   nombre = '';
   readonly tareas: string[] = [];
 }
 
-/** BUILDER: los pasos que todo constructor de protocolos debe saber hacer. */
 export interface ProtocoloBuilder {
   reiniciar(): void;
   definirNombre(): void;
@@ -29,7 +12,6 @@ export interface ProtocoloBuilder {
   obtenerResultado(): ProtocoloAtencion;
 }
 
-/** Parte común a todos los builders, para no repetir código. */
 abstract class ProtocoloBuilderBase implements ProtocoloBuilder {
   protected protocolo = new ProtocoloAtencion();
 
@@ -39,7 +21,6 @@ abstract class ProtocoloBuilderBase implements ProtocoloBuilder {
 
   abstract definirNombre(): void;
 
-  // Por defecto un paso no agrega nada. Cada builder sobrescribe los que usa.
   agregarTareasDePreparacion(): void {}
   agregarTareasDeMonitoreo(): void {}
   agregarTareasDeAislamiento(): void {}
@@ -49,7 +30,6 @@ abstract class ProtocoloBuilderBase implements ProtocoloBuilder {
   }
 }
 
-/** BUILDER CONCRETO: "Ingreso Pre-Quirúrgico" (HU 2.1, Escenario 1). */
 export class PreOpProtocolBuilder extends ProtocoloBuilderBase {
   definirNombre(): void {
     this.protocolo.nombre = 'Ingreso Pre-Quirúrgico';
@@ -65,7 +45,6 @@ export class PreOpProtocolBuilder extends ProtocoloBuilderBase {
   }
 }
 
-/** BUILDER CONCRETO: "Ingreso por Infección Respiratoria" (HU 2.1, Escenario 2). */
 export class RespiratoryProtocolBuilder extends ProtocoloBuilderBase {
   definirNombre(): void {
     this.protocolo.nombre = 'Ingreso por Infección Respiratoria';
@@ -80,7 +59,6 @@ export class RespiratoryProtocolBuilder extends ProtocoloBuilderBase {
   }
 }
 
-/** DIRECTOR: la "receta" con el orden de los pasos. Sirve para cualquier builder. */
 export class DirectorDeProtocolos {
   construirProtocoloDeIngreso(builder: ProtocoloBuilder): ProtocoloAtencion {
     builder.reiniciar();
@@ -92,10 +70,6 @@ export class DirectorDeProtocolos {
   }
 }
 
-/**
- * Elige el builder según el motivo de ingreso. Devuelve null cuando el
- * motivo no tiene un protocolo definido en las consignas (motivo "OTRO").
- */
 export function elegirBuilder(motivoIngreso: string): ProtocoloBuilder | null {
   switch (motivoIngreso) {
     case 'PRE_QUIRURGICO':

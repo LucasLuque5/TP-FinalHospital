@@ -53,7 +53,6 @@ async function registrar() {
   if (!registro) return;
 
   if (registro.fueraDeRango) {
-    // Los valores anormales se informan como error (en rojo) para que no pasen inadvertidos.
     error.value = 'Registro guardado con valores FUERA DE RANGO. Se notificó al médico de guardia.';
   } else {
     exito.value = 'Registro guardado. Controles dentro de los rangos normales.';

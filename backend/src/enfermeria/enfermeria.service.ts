@@ -27,7 +27,6 @@ import {
 } from './entities/enfermeria.entities.js';
 import { detectarAnomalias } from './rangos-signos-vitales.js';
 
-/** Tolerancia para administrar una dosis: 30 minutos antes o después de la hora programada. */
 export const MARGEN_ADMINISTRACION_MINUTOS = 30;
 
 @Injectable()
@@ -45,10 +44,6 @@ export class EnfermeriaService {
     private readonly eventos: EventEmitter2,
   ) {}
 
-  // =====================================================================
-  // HU 1.1 - CONTROL Y REGISTRO DE SIGNOS VITALES
-  // =====================================================================
-
   listarSignos(pacienteId?: number): Promise<SignoVital[]> {
     return this.signos.find({
       where: pacienteId ? { pacienteId } : {},
@@ -59,7 +54,6 @@ export class EnfermeriaService {
   }
 
   async registrarSignos(dto: RegistrarSignosVitalesDto, enfermero: UsuarioActual) {
-    // Solo se controlan pacientes que están internados.
     const internacion = await this.recursos.obtenerInternacionActiva(dto.internacionId);
     const anomalias = detectarAnomalias(dto);
     const fueraDeRango = anomalias.length > 0;
@@ -78,7 +72,6 @@ export class EnfermeriaService {
         }),
       );
 
-      // Nota de enfermería automática (se guarda en la misma transacción).
       await manager.save(
         manager.create(NotaEnfermeria, {
           pacienteId: internacion.pacienteId,
@@ -93,7 +86,6 @@ export class EnfermeriaService {
     });
 
     if (fueraDeRango) {
-      // Escenario 2: notificación de alta prioridad al médico de guardia.
       const { paciente, cama } = internacion;
       await this.notificaciones.notificar({
         rolDestino: NombreRol.Medico,
@@ -106,10 +98,6 @@ export class EnfermeriaService {
     }
     return registro;
   }
-
-  // =====================================================================
-  // NOTAS DE ENFERMERÍA
-  // =====================================================================
 
   listarNotas(pacienteId: number): Promise<NotaEnfermeria[]> {
     return this.notas.find({
@@ -127,11 +115,6 @@ export class EnfermeriaService {
     );
   }
 
-  // =====================================================================
-  // HU 1.2 - ADMINISTRACIÓN DE MEDICACIÓN PRESCRITA
-  // =====================================================================
-
-  /** El médico tratante prescribe. Se generan las dosis programadas. */
   async crearIndicacion(dto: CrearIndicacionDto, medico: UsuarioActual): Promise<IndicacionMedica> {
     await this.exigirInternado(dto.pacienteId);
     await this.inventario.obtenerInsumo(dto.insumoId);
@@ -164,7 +147,6 @@ export class EnfermeriaService {
     });
   }
 
-  /** Dosis de las indicaciones activas: las pendientes y las ya administradas. */
   listarAdministraciones(): Promise<AdministracionMedicacion[]> {
     return this.administraciones.find({
       where: { indicacion: { activa: true } },
@@ -176,7 +158,6 @@ export class EnfermeriaService {
 
   async administrar(administracionId: number, enfermero: UsuarioActual) {
     const evento = await this.dataSource.transaction(async (manager) => {
-      // Se bloquea la fila para que dos enfermeros no administren la misma dosis.
       const dosis = await manager.findOne(AdministracionMedicacion, {
         where: { id: administracionId },
         lock: { mode: 'pessimistic_write' },
@@ -194,7 +175,6 @@ export class EnfermeriaService {
         throw new UnprocessableEntityException('La indicación médica ya no está activa.');
       }
 
-      // Margen de tiempo permitido: +/- 30 minutos respecto de la hora programada.
       const ahora = new Date();
       const desde = sumarMinutos(dosis.horaProgramada, -MARGEN_ADMINISTRACION_MINUTOS);
       const hasta = sumarMinutos(dosis.horaProgramada, MARGEN_ADMINISTRACION_MINUTOS);
@@ -207,7 +187,7 @@ export class EnfermeriaService {
 
       dosis.estado = 'Administrada';
       dosis.administradaEn = ahora;
-      dosis.enfermeroId = enfermero.id; // queda vinculado el usuario que la aplicó
+      dosis.enfermeroId = enfermero.id;
       dosis.eventoId = randomUUID();
       await manager.save(dosis);
 
@@ -223,10 +203,6 @@ export class EnfermeriaService {
       return datosEvento;
     });
 
-    // Evento "MedicacionAdministrada": Enfermería no sabe quién lo escucha.
-    // Hoy reaccionan Inventario (descuenta stock) y Facturación (genera el
-    // cargo). Se emite con la transacción ya confirmada y sin esperar a los
-    // oyentes, para no demorar al enfermero.
     this.eventos.emit(EVENTOS.MEDICACION_ADMINISTRADA, evento);
 
     return this.administraciones.findOne({

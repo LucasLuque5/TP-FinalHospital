@@ -9,11 +9,6 @@ import {
 } from 'typeorm';
 import { Paciente } from '../../hce/entities/paciente.entity.js';
 
-/**
- * Niveles de triaje. La consigna solo nombra el nivel 1 ("Riesgo Vital",
- * Código Rojo); el resto sigue la escala estándar de 5 colores.
- * Cuanto MENOR es el número, MAYOR es la urgencia.
- */
 export const NIVELES_TRIAJE: Record<number, { nombre: string; color: string }> = {
   1: { nombre: 'Riesgo Vital', color: 'Rojo' },
   2: { nombre: 'Emergencia', color: 'Naranja' },

@@ -4,7 +4,6 @@ import type { Cama, Insumo, Internacion, MovimientoInventario } from '@/shared/t
 export type AccionCama = 'confirmar-limpieza' | 'bloquear' | 'desbloquear';
 
 export const recursosService = {
-  // ---------- Camas ----------
   async mapaDeCamas() {
     return (await httpClient.get<Cama[]>('/recursos/camas')).data;
   },
@@ -18,7 +17,6 @@ export const recursosService = {
     await httpClient.post(`/recursos/camas/${camaId}/${accion}`);
   },
 
-  // ---------- Internaciones ----------
   async internacionesActivas() {
     return (await httpClient.get<Internacion[]>('/recursos/internaciones')).data;
   },
@@ -29,7 +27,6 @@ export const recursosService = {
     return (await httpClient.get<Internacion[]>('/recursos/camas-historial')).data;
   },
 
-  // ---------- Inventario ----------
   async listarInsumos() {
     return (await httpClient.get<Insumo[]>('/recursos/insumos')).data;
   },

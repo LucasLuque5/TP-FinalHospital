@@ -13,13 +13,11 @@ import { NotificacionesModule } from './shared/notificaciones/notificaciones.mod
 
 @Module({
   imports: [
-    // Infraestructura común
-    ConfigModule.forRoot({ isGlobal: true }), // lee el archivo .env
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({ inject: [ConfigService], useFactory: configurarBaseDeDatos }),
-    EventEmitterModule.forRoot(), // bus de eventos entre módulos
+    EventEmitterModule.forRoot(),
     NotificacionesModule,
 
-    // Los 6 módulos (componentes) del diseño
     IamModule,
     HceModule,
     AdmisionModule,

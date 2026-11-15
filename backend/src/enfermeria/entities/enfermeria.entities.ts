@@ -47,11 +47,9 @@ export class SignoVital {
   @Column({ type: 'decimal', precision: 4, scale: 1, transformer: transformadorDecimal })
   temperatura: number;
 
-  /** true = el frontend lo muestra destacado en rojo. */
   @Column({ name: 'fuera_de_rango', type: 'bit' })
   fueraDeRango: boolean;
 
-  /** Estampa de tiempo: la pone la base de datos al insertar. */
   @CreateDateColumn({ name: 'registrado_en', type: 'datetime2' })
   registradoEn: Date;
 }
@@ -74,7 +72,6 @@ export class NotaEnfermeria {
   @Column({ type: 'nvarchar' })
   texto: string;
 
-  /** true = la generó el sistema; false = la escribió el enfermero. */
   @Column({ type: 'bit' })
   automatica: boolean;
 
@@ -117,7 +114,6 @@ export class IndicacionMedica {
   creadoEn: Date;
 }
 
-/** Una dosis programada de una indicación. */
 @Entity('administraciones_medicacion')
 export class AdministracionMedicacion {
   @PrimaryGeneratedColumn()
@@ -139,7 +135,6 @@ export class AdministracionMedicacion {
   @Column({ name: 'administrada_en', type: 'datetime2', nullable: true })
   administradaEn: Date | null;
 
-  /** Usuario del enfermero que aplicó la dosis. */
   @ManyToOne(() => Usuario, { nullable: true })
   @JoinColumn({ name: 'enfermero_id' })
   enfermero: Relation<Usuario> | null;

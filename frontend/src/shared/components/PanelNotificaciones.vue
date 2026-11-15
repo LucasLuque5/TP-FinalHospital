@@ -3,12 +3,6 @@ import { ref } from 'vue';
 import { useNotificacionesStore } from '@/shared/stores/notificaciones';
 import { fechaHora } from '@/shared/utils/formato';
 
-/**
- * Barra superior con:
- *  - el cartel destacado de la última alerta de prioridad ALTA
- *    (ej. Código Rojo, signos vitales fuera de rango);
- *  - la campana con el historial de notificaciones del usuario.
- */
 const notificaciones = useNotificacionesStore();
 const abierto = ref(false);
 
@@ -35,8 +29,6 @@ function alternar() {
         <span v-if="notificaciones.sinLeer > 0" class="contador">{{ notificaciones.sinLeer }}</span>
       </button>
 
-      <!-- v-show y no v-if: la lista se abre y cierra seguido, así que conviene
-           dejarla en el DOM y solo ocultarla (display: none). -->
       <div v-show="abierto" class="lista tarjeta">
         <p v-if="notificaciones.lista.length === 0" class="vacio">No hay notificaciones.</p>
         <article

@@ -5,15 +5,6 @@ export interface MensajeEnVivo {
   datos: any;
 }
 
-/**
- * Se conecta al canal en tiempo real del backend (Server-Sent Events).
- *
- * El navegador trae una clase para esto (EventSource), pero no permite
- * enviar la cabecera Authorization con el token. Por eso se usa fetch y
- * se va leyendo la respuesta de a pedazos a medida que llegan mensajes.
- *
- * Devuelve una función para cortar la conexión.
- */
 export function conectarEnVivo(alRecibir: (mensaje: MensajeEnVivo) => void): () => void {
   const control = new AbortController();
 
@@ -33,7 +24,6 @@ export function conectarEnVivo(alRecibir: (mensaje: MensajeEnVivo) => void): () 
       if (done) break;
       pendiente += decodificador.decode(value, { stream: true });
 
-      // Cada mensaje termina con una línea en blanco.
       const bloques = pendiente.split('\n\n');
       pendiente = bloques.pop() ?? '';
       for (const bloque of bloques) {
@@ -43,13 +33,11 @@ export function conectarEnVivo(alRecibir: (mensaje: MensajeEnVivo) => void): () 
     }
   }
 
-  // Si la conexión se corta (ej. se reinició el backend) se reintenta a los 5 segundos.
   async function mantenerConexion() {
     while (!control.signal.aborted) {
       try {
         await escuchar();
       } catch {
-        /* se reintenta abajo */
       }
       if (!control.signal.aborted) await new Promise((resolver) => setTimeout(resolver, 5000));
     }

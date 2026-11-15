@@ -7,7 +7,6 @@ import type { Turno } from '@/shared/tipos';
 import { fechaHora } from '@/shared/utils/formato';
 import { admisionService } from '../services/admision.service';
 
-/** Pantalla del rol Paciente: ve sus turnos y puede confirmar o cancelar. */
 const { error, exito, cargando, ejecutar } = useAccion();
 const turnos = ref<Turno[]>([]);
 

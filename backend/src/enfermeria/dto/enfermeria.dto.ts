@@ -13,8 +13,6 @@ export class RegistrarSignosVitalesDto {
   @IsInt()
   internacionId: number;
 
-  // Los límites de acá solo descartan errores de tipeo (ej. presión 1200).
-  // Que un valor sea "normal" o no se evalúa en rangos-signos-vitales.ts.
   @IsInt()
   @Min(30)
   @Max(300)

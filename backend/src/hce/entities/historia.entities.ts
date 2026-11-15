@@ -9,11 +9,6 @@ import {
 } from 'typeorm';
 import { Usuario } from '../../iam/entities/usuario.entity.js';
 
-/**
- * Entidades que forman la historia clínica de un paciente.
- * Todas guardan el paciente_id para saber a quién pertenecen.
- */
-
 @Entity('alergias')
 export class Alergia {
   @PrimaryGeneratedColumn()
@@ -56,7 +51,6 @@ export class AntecedenteFamiliar {
   registradoEn: Date;
 }
 
-/** Evolución médica: una vez escrita NO se modifica ni se borra (es inmutable). */
 @Entity('evoluciones_medicas')
 export class EvolucionMedica {
   @PrimaryGeneratedColumn()

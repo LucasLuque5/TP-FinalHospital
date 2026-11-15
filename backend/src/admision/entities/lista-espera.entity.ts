@@ -10,7 +10,6 @@ import {
 import { Paciente } from '../../hce/entities/paciente.entity.js';
 import { Usuario } from '../../iam/entities/usuario.entity.js';
 
-/** Cola de pacientes en espera (standby) para un médico y un día. */
 @Entity('lista_espera')
 export class ListaEspera {
   @PrimaryGeneratedColumn()

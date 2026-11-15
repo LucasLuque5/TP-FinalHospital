@@ -15,7 +15,6 @@ const ingreso = reactive({ insumoId: null as number | null, cantidad: 10, motivo
 async function cargar() {
   insumos.value = await recursosService.listarInsumos();
 }
-// El stock se actualiza solo cuando enfermería administra una dosis.
 useMonitor('inventario', cargar);
 
 async function registrarIngreso() {

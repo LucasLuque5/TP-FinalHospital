@@ -4,10 +4,6 @@ import { Notificacion } from './notificacion.entity.js';
 import { NotificacionesController } from './notificaciones.controller.js';
 import { NotificacionesService } from './notificaciones.service.js';
 
-/**
- * Componente compartido: lo importan los módulos que necesitan alertar
- * a alguien (médicos de guardia, recepción, monitores de administración).
- */
 @Module({
   imports: [TypeOrmModule.forFeature([Notificacion])],
   controllers: [NotificacionesController],

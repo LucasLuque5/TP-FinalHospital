@@ -4,17 +4,9 @@ import httpClient from '@/shared/services/httpClient';
 import { conectarEnVivo } from '@/shared/services/enVivo';
 import type { Monitor, Notificacion } from '@/shared/tipos';
 
-/**
- * STORE DE NOTIFICACIONES
- * Mantiene la conexión en tiempo real con el backend y reparte lo que llega:
- *  - las alertas se guardan en "lista" (las muestra la campana y los avisos);
- *  - los avisos de "actualización" se pasan a las pantallas suscriptas para
- *    que recarguen sus datos (ej. el mapa de camas).
- */
 export const useNotificacionesStore = defineStore('notificaciones', () => {
   const lista = ref<Notificacion[]>([]);
   const sinLeer = ref(0);
-  /** Última alerta de prioridad ALTA: se muestra como cartel destacado. */
   const alertaDestacada = ref<Notificacion | null>(null);
 
   const suscriptores = new Map<Monitor, Set<() => void>>();
@@ -45,7 +37,6 @@ export const useNotificacionesStore = defineStore('notificaciones', () => {
     alertaDestacada.value = null;
   }
 
-  /** Registra una función que se ejecuta cuando cambia un monitor. Devuelve cómo darse de baja. */
   function suscribir(monitor: Monitor, recargar: () => void): () => void {
     if (!suscriptores.has(monitor)) suscriptores.set(monitor, new Set());
     suscriptores.get(monitor)!.add(recargar);

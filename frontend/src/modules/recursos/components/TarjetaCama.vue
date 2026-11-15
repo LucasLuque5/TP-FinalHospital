@@ -5,21 +5,11 @@ import type { Cama } from '@/shared/tipos';
 import { fechaHora, nombreCompleto } from '@/shared/utils/formato';
 import type { AccionCama } from '../services/recursos.service';
 
-/**
- * Tarjeta de una cama en el mapa de camas.
- *
- * Es un componente "de presentación": recibe los datos por PROPS y avisa
- * lo que hizo el usuario con EVENTOS (emit). No llama al backend: eso lo
- * decide la pantalla que la usa (CamasListView). Así la tarjeta se puede
- * reutilizar en cualquier otra pantalla.
- */
 defineProps<{
   cama: Cama;
-  /** true mientras la pantalla espera una respuesta del backend. */
   ocupado: boolean;
 }>();
 
-// Eventos que la tarjeta puede emitir, con el tipo de dato que lleva cada uno.
 const emit = defineEmits<{
   asignar: [cama: Cama];
   alta: [cama: Cama];

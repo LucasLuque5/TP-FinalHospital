@@ -1,7 +1,6 @@
 import httpClient from '@/shared/services/httpClient';
 import type { Rol, Usuario, UsuarioSesion } from '@/shared/tipos';
 
-/** Todas las llamadas al backend del módulo IAM. */
 export const iamService = {
   async login(nombreUsuario: string, password: string) {
     const { data } = await httpClient.post<{ token: string; usuario: UsuarioSesion }>('/iam/login', {

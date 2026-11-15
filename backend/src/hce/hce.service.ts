@@ -28,8 +28,6 @@ export class HceService {
     @InjectRepository(Estudio) private readonly estudios: Repository<Estudio>,
   ) {}
 
-  // ---------- Ficha demográfica ----------
-
   listarPacientes(buscar?: string): Promise<Paciente[]> {
     const consulta = this.pacientes.createQueryBuilder('p').orderBy('p.apellido').addOrderBy('p.nombre');
     if (buscar?.trim()) {
@@ -40,7 +38,6 @@ export class HceService {
     return consulta.getMany();
   }
 
-  /** La usan los demás módulos para validar que un paciente existe. */
   async obtenerPaciente(id: number): Promise<Paciente> {
     const paciente = await this.pacientes.findOneBy({ id });
     if (!paciente) throw new NotFoundException(`No existe el paciente con ID ${id}.`);
@@ -58,8 +55,6 @@ export class HceService {
     const paciente = await this.obtenerPaciente(id);
     return this.pacientes.save(Object.assign(paciente, dto));
   }
-
-  // ---------- Historia clínica ----------
 
   async obtenerHistoria(pacienteId: number) {
     const paciente = await this.obtenerPaciente(pacienteId);
@@ -82,10 +77,6 @@ export class HceService {
     return this.antecedentes.save(this.antecedentes.create({ ...dto, pacienteId }));
   }
 
-  /**
-   * Las evoluciones solo se AGREGAN. No existe ningún método para editarlas
-   * o borrarlas: así se cumple que la historia clínica es inmutable.
-   */
   async registrarEvolucion(pacienteId: number, dto: CrearEvolucionDto, medico: UsuarioActual) {
     await this.obtenerPaciente(pacienteId);
     return this.evoluciones.save(

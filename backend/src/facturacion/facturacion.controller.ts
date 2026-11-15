@@ -7,7 +7,6 @@ import { FacturacionService } from './facturacion.service.js';
 
 const { Administrador, Recepcionista } = NombreRol;
 
-/** El "analista de facturación" de las historias se asignó al rol Administrador. */
 @ApiTags('Facturación')
 @Controller('facturacion')
 export class FacturacionController {

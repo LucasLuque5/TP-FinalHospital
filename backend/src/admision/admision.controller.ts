@@ -34,8 +34,6 @@ export class AdmisionController {
     private readonly triaje: TriajeService,
   ) {}
 
-  // ---------- Agenda y turnos ----------
-
   @Roles(Administrador, Recepcionista, Medico)
   @Get('turnos')
   listarTurnos(@Query('fecha') fecha?: string, @Query('medicoId') medicoId?: string) {
@@ -96,8 +94,6 @@ export class AdmisionController {
     return this.turnos.insertarEntreturno(dto);
   }
 
-  // ---------- Lista de espera ----------
-
   @Roles(Recepcionista, Administrador)
   @Get('lista-espera')
   listarEspera(@Query('fecha') fecha?: string, @Query('medicoId') medicoId?: string) {
@@ -109,8 +105,6 @@ export class AdmisionController {
   agregarAListaEspera(@Body() dto: AgregarListaEsperaDto) {
     return this.turnos.agregarAListaEspera(dto);
   }
-
-  // ---------- Guardia (triaje) ----------
 
   @Roles(Enfermero, Medico)
   @Get('guardia')
@@ -131,7 +125,6 @@ export class AdmisionController {
     return this.triaje.marcarAtendido(id);
   }
 
-  /** Si no llega ?fecha=AAAA-MM-DD se usa el día de hoy. */
   private fechaODefecto(fecha?: string): string {
     if (!fecha) return aFechaLocal(new Date());
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {

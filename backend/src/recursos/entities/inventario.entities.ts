@@ -20,7 +20,6 @@ export class Insumo {
   stock: number;
 }
 
-/** Cada entrada o salida de stock queda registrada (trazabilidad). */
 @Entity('movimientos_inventarios')
 export class MovimientoInventario {
   @PrimaryGeneratedColumn()
@@ -42,7 +41,6 @@ export class MovimientoInventario {
   @Column({ type: 'nvarchar' })
   motivo: string;
 
-  /** ID del evento que originó el movimiento (ej. MedicacionAdministrada). */
   @Column({ name: 'evento_id', type: 'uniqueidentifier', nullable: true })
   eventoId: string | null;
 

@@ -10,7 +10,6 @@ useMonitor('camas', async () => {
   camas.value = await recursosService.mapaDeCamas();
 });
 
-/** Agrupa las camas por habitación para mostrar una fila por cada una. */
 const habitaciones = computed(() => {
   const grupos = new Map<number, { habitacion: Habitacion; camas: Cama[] }>();
   for (const cama of camas.value) {

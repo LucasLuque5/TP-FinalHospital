@@ -24,7 +24,7 @@ import { ProtocolosService } from './protocolos.service.js';
       Protocolo,
       ProtocoloTarea,
     ]),
-    RecursosModule, // para consultar internaciones e insumos
+    RecursosModule,
     NotificacionesModule,
   ],
   controllers: [EnfermeriaController],

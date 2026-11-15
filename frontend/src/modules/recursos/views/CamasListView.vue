@@ -10,7 +10,6 @@ import { recursosService, type AccionCama } from '../services/recursos.service';
 const { error, exito, cargando, ejecutar } = useAccion();
 
 const camas = ref<Cama[]>([]);
-/** Cama sobre la que se abrió el formulario de asignación (null = ninguna). */
 const camaElegida = ref<Cama | null>(null);
 const ingreso = reactive({
   pacienteId: null as number | null,
@@ -21,8 +20,6 @@ const ingreso = reactive({
 async function cargar() {
   camas.value = await recursosService.mapaDeCamas();
 }
-// MONITOR EN TIEMPO REAL: cuando cualquier usuario cambia el estado de una
-// cama, el backend publica un evento y este mapa se recarga solo.
 useMonitor('camas', cargar);
 
 async function accionar(accion: () => Promise<unknown>, mensaje: string) {
@@ -92,7 +89,6 @@ const darDeAlta = (cama: Cama) =>
     </form>
   </section>
 
-  <!-- Cada tarjeta recibe su cama por props y avisa con eventos qué botón se pulsó. -->
   <div class="mapa">
     <TarjetaCama
       v-for="cama in camas"

@@ -8,7 +8,6 @@ import { NotificacionesService } from '../shared/notificaciones/notificaciones.s
 import type { IngresoStockDto } from './dto/recursos.dto.js';
 import { Insumo, MovimientoInventario } from './entities/inventario.entities.js';
 
-/** Gestión básica de inventario de insumos médicos (Épica 3 de Recursos). */
 @Injectable()
 export class InventarioService {
   private readonly logger = new Logger(InventarioService.name);
@@ -33,18 +32,15 @@ export class InventarioService {
     });
   }
 
-  /** La usa Enfermería para validar el insumo de una indicación médica. */
   async obtenerInsumo(id: number): Promise<Insumo> {
     const insumo = await this.insumos.findOneBy({ id });
     if (!insumo) throw new NotFoundException(`No existe el insumo ${id}.`);
     return insumo;
   }
 
-  /** Reposición de stock (entrada manual). */
   async registrarIngreso(insumoId: number, dto: IngresoStockDto, usuario: UsuarioActual) {
     await this.obtenerInsumo(insumoId);
     await this.dataSource.transaction(async (manager) => {
-      // Incremento atómico: la suma la hace la base de datos, no el programa.
       await manager.increment(Insumo, { id: insumoId }, 'stock', dto.cantidad);
       await manager.save(
         manager.create(MovimientoInventario, {
@@ -61,22 +57,10 @@ export class InventarioService {
     return this.obtenerInsumo(insumoId);
   }
 
-  /**
-   * HU 3.1 - DESCUENTO OPERATIVO DE STOCK
-   *
-   * Este método NO lo llama nadie directamente: se ejecuta solo cuando
-   * Enfermería publica el evento "medicacion.administrada".
-   * { async: true } => se ejecuta en segundo plano, sin frenar al enfermero.
-   */
   @OnEvent(EVENTOS.MEDICACION_ADMINISTRADA, { async: true })
   async alAdministrarMedicacion(evento: MedicacionAdministradaEvento): Promise<void> {
     try {
       const descontado = await this.dataSource.transaction(async (manager) => {
-        // OPERACIÓN ATÓMICA: se resta y se valida en UNA sola sentencia SQL.
-        //   UPDATE insumos SET stock = stock - 1 WHERE id = @id AND stock >= 1
-        // Mal: leer el stock (50), restar en el programa (49) y guardar 49.
-        // Si dos enfermeros lo hacen a la vez, ambos leen 50 y ambos guardan
-        // 49: se pierde un descuento. Con la sentencia atómica eso no pasa.
         const resultado = await manager
           .createQueryBuilder()
           .update(Insumo)
@@ -87,7 +71,7 @@ export class InventarioService {
           })
           .execute();
 
-        if (resultado.affected !== 1) return false; // no alcanzaba el stock
+        if (resultado.affected !== 1) return false;
 
         await manager.save(
           manager.create(MovimientoInventario, {
@@ -112,7 +96,6 @@ export class InventarioService {
       }
       this.notificaciones.difundirActualizacion('inventario');
     } catch (error) {
-      // Un error acá no debe afectar a quien publicó el evento.
       this.logger.error(`No se pudo descontar stock (evento ${evento.eventoId})`, error);
     }
   }

@@ -40,17 +40,12 @@ export class Cama {
   @Column({ type: 'nvarchar' })
   estado: EstadoCama;
 
-  /** Número de versión de la fila. Se usa para el bloqueo optimista. */
   @Column({ type: 'int' })
   version: number;
 }
 
 export type MotivoIngreso = 'PRE_QUIRURGICO' | 'INFECCION_RESPIRATORIA' | 'OTRO';
 
-/**
- * Una fila de camas_historial es una INTERNACIÓN: qué paciente ocupó qué
- * cama, desde cuándo y hasta cuándo. Si fechaEgreso es null, sigue internado.
- */
 @Entity('camas_historial')
 export class Internacion {
   @PrimaryGeneratedColumn()

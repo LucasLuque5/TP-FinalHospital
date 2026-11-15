@@ -3,18 +3,9 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSesionStore } from '@/modules/iam/stores/sesion';
 
-/**
- * VISTA CONTENEDORA (layout) del módulo de Facturación.
- *
- * Las 5 pantallas del módulo son RUTAS HIJAS de /facturacion (ver
- * facturacion.routes.ts). Este componente dibuja lo que comparten todas
- * (título y pestañas) y deja un <RouterView /> donde vue-router coloca
- * la pantalla hija que corresponda a la dirección actual.
- */
 const router = useRouter();
 const sesion = useSesionStore();
 
-// Las pestañas salen de las rutas hijas, filtradas por el rol del usuario.
 const pestanas = computed(() => {
   const padre = router.getRoutes().find((ruta) => ruta.name === 'facturacion');
   return (padre?.children ?? []).filter(
@@ -30,7 +21,6 @@ const pestanas = computed(() => {
     </RouterLink>
   </nav>
 
-  <!-- Acá se dibuja la ruta hija: obras sociales, coberturas, facturas, etc. -->
   <RouterView />
 </template>
 

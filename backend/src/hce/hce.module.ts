@@ -16,8 +16,6 @@ import { HceService } from './hce.service.js';
   ],
   controllers: [HceController],
   providers: [HceService],
-  // Lo que se exporta es la "interfaz pública" del componente:
-  // los demás módulos solo pueden usar HceService.
   exports: [HceService],
 })
 export class HceModule {}

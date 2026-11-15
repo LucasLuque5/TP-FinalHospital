@@ -4,18 +4,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { useSesionStore } from '@/modules/iam/stores/sesion';
 import { useNotificacionesStore } from '@/shared/stores/notificaciones';
 
-/**
- * Menú lateral. No tiene los enlaces escritos a mano: los arma leyendo las
- * rutas del router y mostrando solo las que el rol del usuario puede usar.
- */
 const router = useRouter();
 const ruta = useRoute();
 const sesion = useSesionStore();
 const notificaciones = useNotificacionesStore();
 
-// En pantallas chicas (celular) el menú se pliega y se abre con un botón.
 const menuAbierto = ref(false);
-// Al elegir una pantalla, el menú se vuelve a cerrar solo.
 watch(() => ruta.fullPath, () => (menuAbierto.value = false));
 
 const grupos = computed(() => {
@@ -134,7 +128,6 @@ a.router-link-active {
 .boton-menu {
   display: none;
 }
-/* Celulares: barra arriba, menú plegado detrás del botón "Menú". */
 @media (max-width: 800px) {
   .barra {
     width: 100%;

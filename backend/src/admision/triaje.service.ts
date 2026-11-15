@@ -7,13 +7,6 @@ import { NotificacionesService } from '../shared/notificaciones/notificaciones.s
 import type { RegistrarTriajeDto } from './dto/admision.dto.js';
 import { NIVELES_TRIAJE, Triaje } from './entities/triaje.entity.js';
 
-/**
- * HU 3.1 - Triaje de guardia.
- *
- * La cola de guardia es una COLA DE PRIORIDAD: no sale primero el que llegó
- * primero, sino el más urgente. A igual urgencia, sí se respeta el orden
- * de llegada.
- */
 @Injectable()
 export class TriajeService {
   constructor(
@@ -22,12 +15,6 @@ export class TriajeService {
     private readonly notificaciones: NotificacionesService,
   ) {}
 
-  /**
-   * Devuelve la cola ordenada. El orden lo resuelve la base de datos:
-   *   ORDER BY nivel ASC (1 = Rojo va primero), ingreso_en ASC
-   * Por eso un Código Rojo recién llegado aparece arriba de todos los
-   * pacientes de menor riesgo sin tener que "mover" a nadie.
-   */
   async obtenerCola() {
     const enEspera = await this.triajes.find({
       where: { estado: 'En espera' },
@@ -55,7 +42,6 @@ export class TriajeService {
     );
 
     if (dto.nivel === 1) {
-      // Alerta destacada en los monitores de los médicos de guardia.
       await this.notificaciones.notificar({
         rolDestino: NombreRol.Medico,
         prioridad: 'ALTA',
@@ -69,7 +55,6 @@ export class TriajeService {
     return cola.find((item) => item.id === guardado.id);
   }
 
-  /** El médico llama al paciente: sale de la cola. */
   async marcarAtendido(id: number): Promise<Triaje> {
     const triaje = await this.triajes.findOneBy({ id });
     if (!triaje) throw new NotFoundException(`No existe el ingreso de guardia ${id}.`);

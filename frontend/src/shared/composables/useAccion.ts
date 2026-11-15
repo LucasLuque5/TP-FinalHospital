@@ -3,17 +3,6 @@ import { mensajeDeError } from '@/shared/services/httpClient';
 import { useNotificacionesStore } from '@/shared/stores/notificaciones';
 import type { Monitor } from '@/shared/tipos';
 
-/**
- * COMPOSABLE: lógica reutilizable entre componentes.
- *
- * Todas las pantallas hacen lo mismo al llamar al backend: marcar que
- * están "cargando", y al terminar mostrar un mensaje de éxito o de error.
- * En vez de repetir ese try/catch en cada pantalla, se escribe una vez acá.
- *
- * Uso:
- *   const { error, exito, cargando, ejecutar } = useAccion();
- *   ejecutar(() => servicio.guardar(datos), 'Guardado correctamente');
- */
 export function useAccion() {
   const error = ref('');
   const exito = ref('');
@@ -38,10 +27,6 @@ export function useAccion() {
   return { error, exito, cargando, ejecutar };
 }
 
-/**
- * Carga los datos al abrir la pantalla y los vuelve a cargar cada vez que
- * el backend avisa que ese monitor cambió (actualización en tiempo real).
- */
 export function useMonitor(monitor: Monitor, recargar: () => void) {
   const notificaciones = useNotificacionesStore();
   let darDeBaja: (() => void) | null = null;

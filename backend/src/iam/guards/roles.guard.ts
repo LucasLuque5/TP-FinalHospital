@@ -8,10 +8,6 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_PERMITIDOS } from '../decorators/roles.decorator.js';
 import type { NombreRol, UsuarioActual } from '../usuario-actual.js';
 
-/**
- * AUTORIZACIÓN (RBAC): responde la pregunta "¿tenés permiso para esto?".
- * Compara el rol del usuario con los roles que la ruta declara en @Roles().
- */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -21,7 +17,6 @@ export class RolesGuard implements CanActivate {
       ROLES_PERMITIDOS,
       [contexto.getHandler(), contexto.getClass()],
     );
-    // Sin @Roles: cualquier usuario autenticado puede pasar.
     if (!rolesPermitidos || rolesPermitidos.length === 0) return true;
 
     const usuario: UsuarioActual | undefined = contexto.switchToHttp().getRequest().usuario;

@@ -1,24 +1,11 @@
-/**
- * PRUEBAS DE PUNTA A PUNTA (e2e) DE LAS HISTORIAS DE USUARIO
- *
- * Cada "describe" corresponde a una historia y cada "it" a un escenario
- * Gherkin de las consignas. Las pruebas le pegan al backend REAL por HTTP,
- * que a su vez usa la base de datos REAL.
- *
- * Cómo ejecutarlas (3 pasos, en este orden):
- *   1) npm run db:crear     -> deja la base con los datos iniciales
- *   2) npm run start        -> levanta el backend (dejarlo corriendo)
- *   3) npm run test:e2e     -> en otra terminal
- */
 const URL_BASE = process.env.API_URL ?? 'http://localhost:3000';
-const CLAVE = 'Hospital123'; // contraseña de los usuarios de prueba (ver 02-datos-iniciales.sql)
+const CLAVE = 'Hospital123';
 
 interface Respuesta<T = any> {
   status: number;
   body: T;
 }
 
-/** Inicia sesión y devuelve una función para hacer peticiones con ese usuario. */
 async function iniciarSesion(nombreUsuario: string) {
   const login = await fetch(`${URL_BASE}/iam/login`, {
     method: 'POST',
@@ -38,16 +25,14 @@ async function iniciarSesion(nombreUsuario: string) {
   };
 }
 
-/** Los eventos se procesan en segundo plano: se espera un instante antes de verificar. */
 const esperarEventos = () => new Promise((resolver) => setTimeout(resolver, 600));
 
 type Cliente = Awaited<ReturnType<typeof iniciarSesion>>;
 let admin: Cliente, recepcion: Cliente, medico: Cliente, enfermero: Cliente, paciente: Cliente;
-let pacientes: Record<string, number>; // "Carlos López" -> id
+let pacientes: Record<string, number>;
 let medicoId: number;
 
 const dosCifras = (numero: number) => String(numero).padStart(2, '0');
-/** Las fechas viajan en formato ISO (UTC); acá se pasan a hora y fecha locales. */
 const horaLocal = (iso: string) => {
   const fecha = new Date(iso);
   return `${dosCifras(fecha.getHours())}:${dosCifras(fecha.getMinutes())}`;
@@ -107,7 +92,6 @@ describe('Admisión HU 1.1 - Reserva de turno seguro', () => {
     const turnos = (await recepcion('GET', `/admision/turnos?medicoId=${medicoId}`)).body;
     const turno = turnoDeLas(turnos, '10:00');
 
-    // Promise.all dispara las dos peticiones al mismo tiempo.
     const [a, b] = await Promise.all([
       recepcion('POST', `/admision/turnos/${turno.id}/reservar`, { pacienteId: pacientes['Carlos López'] }),
       admin('POST', `/admision/turnos/${turno.id}/reservar`, { pacienteId: pacientes['Laura Gómez'] }),
@@ -136,9 +120,9 @@ describe('Admisión HU 1.2 - Entreturno dinámico', () => {
     const turnos = (await recepcion('GET', `/admision/turnos?medicoId=${medicoId}`)).body;
     const deLas10 = turnoDeLas(turnos, '10:00');
     expect(deLas10.duracionMinutos).toBe(15);
-    expect(deLas10.tiempoReducido).toBe(true); // etiqueta visual
-    expect(turnoDeLas(turnos, '10:30').duracionMinutos).toBe(30); // el siguiente no cambia
-    expect(new Set(turnos.map((t: any) => t.id)).size).toBe(turnos.length); // sin IDs repetidos
+    expect(deLas10.tiempoReducido).toBe(true);
+    expect(turnoDeLas(turnos, '10:30').duracionMinutos).toBe(30);
+    expect(new Set(turnos.map((t: any) => t.id)).size).toBe(turnos.length);
   });
 });
 
@@ -165,7 +149,6 @@ describe('Admisión HU 1.3 - Lista de espera por cancelación', () => {
     expect(nuevoDeLas11.estado).toBe('Programado');
     expect(nuevoDeLas11.paciente.apellido).toBe('Medina');
 
-    // Salió de la cola y se alertó a recepción.
     expect((await recepcion('GET', '/admision/lista-espera')).body).toHaveLength(0);
     const avisos = (await recepcion('GET', '/notificaciones')).body;
     expect(avisos[0].mensaje).toContain('Luis Medina');
@@ -224,7 +207,6 @@ describe('Admisión HU 3.1 - Triaje de guardia', () => {
     expect(avisos[0].prioridad).toBe('ALTA');
     expect(avisos[0].titulo).toContain('CÓDIGO ROJO');
 
-    // Se vacía la cola para dejar libres a los pacientes.
     for (const item of cola) await medico('POST', `/admision/guardia/${item.id}/atender`);
   });
 });
@@ -250,7 +232,6 @@ describe('Recursos HU 1.1 - Asignación segura de cama', () => {
     expect([a.status, b.status].sort()).toEqual([201, 409]);
     expect((a.status === 409 ? a : b).body.message).toContain('acaba de ser ocupada');
 
-    // Escenario 1: la cama quedó "Ocupada" y vinculada a UN solo paciente.
     const despues = (await recepcion('GET', '/recursos/camas')).body.find((c: any) => c.codigo === '101');
     expect(despues.estado).toBe('Ocupada');
     expect(despues.internacion.paciente).toBeTruthy();
@@ -259,7 +240,6 @@ describe('Recursos HU 1.1 - Asignación segura de cama', () => {
 
 describe('Enfermería HU 2.1 - Protocolos de atención (patrón Builder)', () => {
   it('genera automáticamente el protocolo que corresponde al motivo de ingreso', async () => {
-    // Se interna a Juan Gómez por neumonía (la cama 101 ya generó el otro protocolo).
     const camas = (await recepcion('GET', '/recursos/camas')).body;
     const cama103 = camas.find((c: any) => c.codigo === '103');
     await recepcion('POST', `/recursos/camas/${cama103.id}/asignar`, {
@@ -279,7 +259,6 @@ describe('Enfermería HU 2.1 - Protocolos de atención (patrón Builder)', () =>
         'Indicación de aislamiento de contacto y gotas',
       ]),
     );
-    // El de la cama 101 pudo ser de cualquiera de los dos tipos (según quién ganó la carrera).
     expect(protocolos.length).toBe(2);
   });
 });
@@ -296,7 +275,6 @@ describe('Recursos HU 2.1 - Higiene y mantenimiento (máquina de estados de la c
       (await recepcion('GET', '/recursos/camas')).body.find((c: any) => c.id === deJuan.camaId).estado;
     expect(await estadoDeLaCama()).toBe('En limpieza');
 
-    // No se puede asignar una cama en limpieza.
     const intento = await recepcion('POST', `/recursos/camas/${deJuan.camaId}/asignar`, {
       pacienteId: pacientes['Juan Gómez'],
       motivoIngreso: 'OTRO',
@@ -363,7 +341,7 @@ describe('Medicación: Enfermería HU 1.2 + Recursos HU 3.1 + Facturación HU 2.
     expect(await stockDeIbuprofeno()).toBe(50);
 
     const dosis = (await enfermero('GET', '/enfermeria/medicacion')).body;
-    const pendiente = dosis.find((d: any) => d.estado === 'Pendiente'); // la primera está en horario
+    const pendiente = dosis.find((d: any) => d.estado === 'Pendiente');
 
     const administrada = await enfermero('POST', `/enfermeria/medicacion/${pendiente.id}/administrar`);
     expect(administrada.status).toBe(200);
@@ -373,23 +351,20 @@ describe('Medicación: Enfermería HU 1.2 + Recursos HU 3.1 + Facturación HU 2.
 
     await esperarEventos();
 
-    // Recursos HU 3.1: descuento atómico del stock.
     expect(await stockDeIbuprofeno()).toBe(49);
 
-    // Facturación HU 2.1: línea "Insumos de Farmacia" vinculada al ID del evento.
     const items = (await admin('GET', '/facturacion/facturas-items')).body;
     const cargo = items.find((i: any) => i.eventoId?.toLowerCase() === eventoId.toLowerCase());
     expect(cargo.concepto).toBe('Insumos de Farmacia');
     expect(cargo.importe).toBe(850);
     expect(cargo.factura.paciente.apellido).toBe('Rojas');
 
-    // La misma dosis no se puede administrar dos veces.
     expect((await enfermero('POST', `/enfermeria/medicacion/${pendiente.id}/administrar`)).status).toBe(409);
   });
 
   it('rechaza una dosis fuera del margen de +/- 30 minutos', async () => {
     const dosis = (await enfermero('GET', '/enfermeria/medicacion')).body;
-    const futura = dosis.find((d: any) => d.estado === 'Pendiente'); // la de dentro de 8 horas
+    const futura = dosis.find((d: any) => d.estado === 'Pendiente');
 
     const intento = await enfermero('POST', `/enfermeria/medicacion/${futura.id}/administrar`);
     expect(intento.status).toBe(422);

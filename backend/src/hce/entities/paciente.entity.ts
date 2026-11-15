@@ -1,6 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-/** Ficha demográfica del paciente. */
 @Entity('pacientes')
 export class Paciente {
   @PrimaryGeneratedColumn()

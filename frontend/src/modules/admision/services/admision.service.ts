@@ -4,7 +4,6 @@ import type { EnGuardia, EnListaEspera, Turno } from '@/shared/tipos';
 export type AccionTurno = 'confirmar' | 'llegada' | 'atender' | 'cancelar';
 
 export const admisionService = {
-  // ---------- Turnos ----------
   async listarTurnos(fecha: string, medicoId?: number) {
     return (await httpClient.get<Turno[]>('/admision/turnos', { params: { fecha, medicoId } })).data;
   },
@@ -30,7 +29,6 @@ export const admisionService = {
     return (await httpClient.post<Turno>('/admision/entreturnos', datos)).data;
   },
 
-  // ---------- Lista de espera ----------
   async listarEspera(fecha: string, medicoId?: number) {
     return (await httpClient.get<EnListaEspera[]>('/admision/lista-espera', { params: { fecha, medicoId } })).data;
   },
@@ -38,7 +36,6 @@ export const admisionService = {
     await httpClient.post('/admision/lista-espera', datos);
   },
 
-  // ---------- Guardia ----------
   async colaDeGuardia() {
     return (await httpClient.get<EnGuardia[]>('/admision/guardia')).data;
   },

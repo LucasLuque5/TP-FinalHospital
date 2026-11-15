@@ -10,13 +10,6 @@ import { RecursosService } from './recursos.service.js';
 
 const { Administrador, Recepcionista, Medico, Enfermero } = NombreRol;
 
-/*
- * Las historias nombran actores que no figuran entre los 5 roles del diseño.
- * Se los asignó así:
- *   "administrativo de piso"   -> Recepcionista / Administrador
- *   "personal de maestranza"   -> Recepcionista / Enfermero / Administrador
- *   "gestor de inventario"     -> Administrador
- */
 @ApiTags('Recursos y camas')
 @Controller('recursos')
 export class RecursosController {
@@ -24,8 +17,6 @@ export class RecursosController {
     private readonly recursos: RecursosService,
     private readonly inventario: InventarioService,
   ) {}
-
-  // ---------- Camas ----------
 
   @Roles(Administrador, Recepcionista, Medico, Enfermero)
   @Get('camas')
@@ -60,8 +51,6 @@ export class RecursosController {
     return this.recursos.aplicarAccion(id, AccionCama.Desbloquear);
   }
 
-  // ---------- Internaciones ----------
-
   @Roles(Administrador, Recepcionista, Medico, Enfermero)
   @Get('internaciones')
   internacionesActivas() {
@@ -80,8 +69,6 @@ export class RecursosController {
   historial() {
     return this.recursos.listarHistorial();
   }
-
-  // ---------- Inventario ----------
 
   @Roles(Administrador, Enfermero, Medico)
   @Get('insumos')

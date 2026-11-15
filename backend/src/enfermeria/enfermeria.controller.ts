@@ -30,8 +30,6 @@ export class EnfermeriaController {
     private readonly protocolos: ProtocolosService,
   ) {}
 
-  // ---------- Signos vitales ----------
-
   @Roles(Enfermero, Medico)
   @Get('signos-vitales')
   listarSignos(@Query('pacienteId', new ParseIntPipe({ optional: true })) pacienteId?: number) {
@@ -44,8 +42,6 @@ export class EnfermeriaController {
     return this.enfermeria.registrarSignos(dto, enfermero);
   }
 
-  // ---------- Notas de enfermería ----------
-
   @Roles(Enfermero, Medico)
   @Get('notas')
   listarNotas(@Query('pacienteId', ParseIntPipe) pacienteId: number) {
@@ -57,8 +53,6 @@ export class EnfermeriaController {
   crearNota(@Body() dto: CrearNotaDto, @Usuario() enfermero: UsuarioActual) {
     return this.enfermeria.crearNota(dto, enfermero);
   }
-
-  // ---------- Medicación ----------
 
   @Roles(Medico)
   @Post('indicaciones')
@@ -78,8 +72,6 @@ export class EnfermeriaController {
   administrar(@Param('id', ParseIntPipe) id: number, @Usuario() enfermero: UsuarioActual) {
     return this.enfermeria.administrar(id, enfermero);
   }
-
-  // ---------- Protocolos de atención ----------
 
   @Roles(Enfermero, Medico)
   @Get('protocolos')

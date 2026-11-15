@@ -12,7 +12,6 @@ import {
 const FORMATO_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const FORMATO_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-/** Gestión de agenda médica: genera los turnos disponibles de un día. */
 export class GenerarAgendaDto {
   @IsInt()
   medicoId: number;

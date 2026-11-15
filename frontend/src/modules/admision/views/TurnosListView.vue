@@ -16,16 +16,13 @@ const esMedico = sesion.tieneRol('Médico');
 const esAdmision = sesion.tieneRol('Recepcionista', 'Administrador');
 const { error, exito, cargando, ejecutar } = useAccion();
 
-// ---------- Filtros ----------
 const fecha = ref(hoy());
 const medicoId = ref<number | null>(esMedico ? sesion.usuario!.id : null);
 const medicos = ref<Usuario[]>([]);
 
-// ---------- Datos ----------
 const turnos = ref<Turno[]>([]);
 const espera = ref<EnListaEspera[]>([]);
 
-/** Paciente con el que se va a reservar, insertar un entreturno o anotar en espera. */
 const pacienteId = ref<number | null>(null);
 const agenda = reactive({ horaInicio: '08:00', horaFin: '12:00', duracionMinutos: 30 });
 const horaEntreturno = ref('');
@@ -40,12 +37,9 @@ onMounted(async () => {
   medicos.value = await iamService.listarMedicos();
   if (!medicoId.value) medicoId.value = medicos.value[0]?.id ?? null;
 });
-// Si cambia la fecha o el médico se vuelve a consultar.
 watch([fecha, medicoId], cargar);
-// ...y también cuando el backend avisa que cambió algún turno (otro usuario reservó, etc.).
 useMonitor('turnos', cargar);
 
-/** Ejecuta una acción y, salga bien o mal, refresca la agenda para ver el estado real. */
 async function accionar(accion: () => Promise<unknown>, mensaje: string) {
   await ejecutar(accion, mensaje);
   await cargar();
@@ -84,7 +78,6 @@ function insertarEntreturno() {
       admisionService.insertarEntreturno({
         medicoId: medicoId.value!,
         pacienteId: pacienteId.value!,
-        // El usuario escribe la hora local; toISOString() la convierte a UTC para enviarla.
         fechaHora: new Date(`${fecha.value}T${horaEntreturno.value}:00`).toISOString(),
       }),
     'Entreturno insertado. Se ajustó la duración del turno afectado.',
@@ -107,7 +100,6 @@ function agregarAEspera() {
   );
 }
 
-/** Hora de fin de un turno, para mostrar "10:00 - 10:15". */
 const horaFin = (turno: Turno) =>
   hora(new Date(new Date(turno.fechaHoraInicio).getTime() + turno.duracionMinutos * 60_000).toISOString());
 </script>
@@ -155,7 +147,6 @@ const horaFin = (turno: Turno) =>
           </td>
           <td>
             {{ turno.duracionMinutos }} min
-            <!-- Etiquetas visuales de la HU 1.2 -->
             <span v-if="turno.esEntreturno" class="etiqueta naranja">Entreturno</span>
             <span v-else-if="turno.tiempoReducido" class="etiqueta amarillo">Tiempo reducido</span>
           </td>
@@ -197,7 +188,6 @@ const horaFin = (turno: Turno) =>
     </table>
   </section>
 
-  <!-- Las tres tarjetas usan el mismo componente con slots (TarjetaSeccion). -->
   <div v-if="esAdmision" class="grilla">
     <TarjetaSeccion
       titulo="Lista de espera del día"

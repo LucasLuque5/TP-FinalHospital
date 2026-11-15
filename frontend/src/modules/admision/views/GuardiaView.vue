@@ -26,7 +26,6 @@ const nuevo = reactive({ pacienteId: null as number | null, nivel: 3, motivo: ''
 async function cargar() {
   cola.value = await admisionService.colaDeGuardia();
 }
-// La cola se actualiza sola cuando otro usuario registra o atiende un paciente.
 useMonitor('guardia', cargar);
 
 async function registrar() {

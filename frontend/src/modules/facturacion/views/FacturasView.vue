@@ -13,7 +13,6 @@ const { error, exito, cargando, ejecutar } = useAccion();
 const facturas = ref<Factura[]>([]);
 const prestaciones = ref<Prestacion[]>([]);
 const orden = reactive({ pacienteId: null as number | null, prestacionId: null as number | null });
-/** Factura recién generada, para mostrar cómo se repartió el costo. */
 const generada = ref<Factura | null>(null);
 
 const PAGADORES: Record<string, string> = {
@@ -44,7 +43,6 @@ async function facturar() {
   await cargar();
 }
 
-/** Suma lo que le corresponde pagar a un pagador dentro de una factura. */
 const total = (factura: Factura, pagador?: string) =>
   factura.items
     .filter((item) => !pagador || item.aCargoDe === pagador)

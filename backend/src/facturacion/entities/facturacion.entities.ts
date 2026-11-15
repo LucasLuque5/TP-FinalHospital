@@ -30,7 +30,6 @@ export class ObraSocial {
   copagoFijo: number;
 }
 
-/** Vincula un paciente con su obra social. Sin fila vigente = Particular. */
 @Entity('coberturas_pacientes')
 export class CoberturaPaciente {
   @PrimaryGeneratedColumn()
@@ -57,7 +56,6 @@ export class CoberturaPaciente {
   vigente: boolean;
 }
 
-/** Nomenclador: prestaciones con su valor base. */
 @Entity('prestaciones')
 export class Prestacion {
   @PrimaryGeneratedColumn()
@@ -73,7 +71,6 @@ export class Prestacion {
   valorBase: number;
 }
 
-/** Lista de precios de insumos. vigenteHasta null = precio vigente. */
 @Entity('precios_insumos')
 export class PrecioInsumo {
   @PrimaryGeneratedColumn()
@@ -111,7 +108,6 @@ export class Factura {
   @Column({ name: 'internacion_id', type: 'int', nullable: true })
   internacionId: number | null;
 
-  /** PRESTACION = una atención puntual. ESTADIA = cuenta de gastos de una internación. */
   @Column({ type: 'nvarchar' })
   tipo: 'PRESTACION' | 'ESTADIA';
 
@@ -165,7 +161,6 @@ export class FacturaItem {
   @Column({ name: 'obra_social_id', type: 'int', nullable: true })
   obraSocialId: number | null;
 
-  /** ID del evento que originó el cargo (trazabilidad de auditoría). */
   @Column({ name: 'evento_id', type: 'uniqueidentifier', nullable: true })
   eventoId: string | null;
 

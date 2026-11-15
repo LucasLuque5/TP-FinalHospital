@@ -1,8 +1,3 @@
-/**
- * Tipos de datos que devuelve el backend. Tenerlos en un solo lugar hace
- * que TypeScript avise si en una pantalla se escribe mal un campo.
- */
-
 export type NombreRol = 'Administrador' | 'Médico' | 'Enfermero' | 'Recepcionista' | 'Paciente';
 
 export interface UsuarioSesion {
@@ -27,7 +22,6 @@ export interface Usuario {
   activo: boolean;
 }
 
-// ---------- HCE ----------
 export interface Paciente {
   id: number;
   dni: string;
@@ -76,7 +70,6 @@ export interface HistoriaClinica {
   estudios: Estudio[];
 }
 
-// ---------- Admisión ----------
 export type EstadoTurno =
   | 'Disponible'
   | 'Programado'
@@ -116,7 +109,6 @@ export interface EnGuardia {
   posicion: number;
 }
 
-// ---------- Recursos ----------
 export type EstadoCama = 'Libre' | 'Ocupada' | 'En limpieza' | 'Bloqueada';
 
 export interface Habitacion {
@@ -162,7 +154,6 @@ export interface MovimientoInventario {
   fecha: string;
 }
 
-// ---------- Enfermería ----------
 export interface SignoVital {
   id: number;
   paciente: Paciente;
@@ -200,7 +191,6 @@ export interface Protocolo {
   tareas: { id: number; orden: number; descripcion: string; completada: boolean }[];
 }
 
-// ---------- Facturación ----------
 export interface ObraSocial {
   id: number;
   nombre: string;
@@ -251,7 +241,6 @@ export interface Factura {
   items: FacturaItem[];
 }
 
-// ---------- Notificaciones ----------
 export interface Notificacion {
   id: number;
   prioridad: 'NORMAL' | 'ALTA';

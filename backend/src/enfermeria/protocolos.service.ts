@@ -9,7 +9,6 @@ import { NotificacionesService } from '../shared/notificaciones/notificaciones.s
 import { Protocolo, ProtocoloTarea } from './entities/enfermeria.entities.js';
 import { DirectorDeProtocolos, elegirBuilder } from './protocolos/protocolo-builder.js';
 
-/** HU 2.1 - Generación automática de protocolos de atención (patrón Builder). */
 @Injectable()
 export class ProtocolosService {
   private readonly logger = new Logger(ProtocolosService.name);
@@ -22,17 +21,12 @@ export class ProtocolosService {
     private readonly notificaciones: NotificacionesService,
   ) {}
 
-  /**
-   * Se ejecuta solo cuando llega el evento de ingreso de un paciente.
-   * Nadie tiene que cargar una orden manual: el protocolo aparece armado.
-   */
   @OnEvent(EVENTOS.INTERNACION_INICIADA, { async: true })
   async alIniciarInternacion(evento: InternacionIniciadaEvento): Promise<void> {
     try {
       const builder = elegirBuilder(evento.motivoIngreso);
-      if (!builder) return; // ese motivo de ingreso no tiene protocolo definido
+      if (!builder) return;
 
-      // El director ejecuta los pasos; el builder elegido decide las tareas.
       const armado = this.director.construirProtocoloDeIngreso(builder);
 
       await this.protocolos.save(
@@ -57,7 +51,6 @@ export class ProtocolosService {
     }
   }
 
-  /** Protocolos de los pacientes que están internados en este momento. */
   async listarActivos(): Promise<Protocolo[]> {
     const internaciones = await this.recursos.listarInternacionesActivas();
     const ids = internaciones.map((internacion) => internacion.id);
@@ -73,7 +66,6 @@ export class ProtocolosService {
       .getMany();
   }
 
-  /** Ejecución de indicaciones: enfermería marca una tarea como realizada. */
   async completarTarea(tareaId: number, enfermero: UsuarioActual): Promise<ProtocoloTarea> {
     const tarea = await this.tareas.findOneBy({ id: tareaId });
     if (!tarea) throw new NotFoundException(`No existe la tarea ${tareaId}.`);

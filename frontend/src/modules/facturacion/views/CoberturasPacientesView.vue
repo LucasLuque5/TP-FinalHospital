@@ -22,7 +22,6 @@ onMounted(async () => {
   await cargar();
 });
 
-/** Validación de cobertura: consulta qué obra social tiene vigente el paciente. */
 async function validar() {
   validada.value = null;
   if (!nueva.pacienteId) {

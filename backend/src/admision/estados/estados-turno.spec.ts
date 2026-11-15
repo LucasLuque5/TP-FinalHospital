@@ -37,7 +37,7 @@ describe('Patrón State - estados del turno', () => {
       'Un turno cancelado no puede avanzar en el flujo de atención.',
     );
     expect(() => obtenerEstado(turno.estado).confirmar(turno)).toThrow(TransicionInvalidaError);
-    expect(turno.estado).toBe(NombreEstadoTurno.Cancelado); // no cambió
+    expect(turno.estado).toBe(NombreEstadoTurno.Cancelado);
   });
 
   it('no permite saltear pasos ni operar sobre un turno Atendido', () => {

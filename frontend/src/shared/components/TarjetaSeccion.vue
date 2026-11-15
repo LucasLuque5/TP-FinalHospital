@@ -1,17 +1,6 @@
 <script setup lang="ts">
-/**
- * Contenedor reutilizable con título. El contenido lo decide quien lo usa,
- * por medio de SLOTS (huecos que se rellenan desde afuera):
- *
- *   <TarjetaSeccion titulo="Lista de espera" descripcion="…">
- *     <template #encabezado> <span class="etiqueta">3</span> </template>   ← slot con nombre
- *     <ol> … </ol>                                                          ← slot por defecto
- *     <template #pie> <button>Agregar</button> </template>                  ← slot con nombre
- *   </TarjetaSeccion>
- */
 defineProps<{ titulo: string; descripcion?: string }>();
 
-// Permite usar en el template "$slots.pie" con tipos.
 defineSlots<{
   default(): unknown;
   encabezado?(): unknown;

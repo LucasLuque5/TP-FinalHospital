@@ -14,7 +14,6 @@ const password = ref('');
 
 async function ingresar() {
   await ejecutar(() => sesion.iniciarSesion(nombreUsuario.value, password.value));
-  // Si no hubo error, el guard del router lleva a la pantalla inicial del rol.
   if (sesion.estaAutenticado) router.push('/inicio');
 }
 </script>

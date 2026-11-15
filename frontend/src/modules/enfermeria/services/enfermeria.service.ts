@@ -2,7 +2,6 @@ import httpClient from '@/shared/services/httpClient';
 import type { Dosis, NotaEnfermeria, Protocolo, SignoVital } from '@/shared/tipos';
 
 export const enfermeriaService = {
-  // ---------- Signos vitales ----------
   async listarSignos(pacienteId?: number) {
     return (await httpClient.get<SignoVital[]>('/enfermeria/signos-vitales', { params: { pacienteId } })).data;
   },
@@ -16,7 +15,6 @@ export const enfermeriaService = {
     return (await httpClient.post<SignoVital>('/enfermeria/signos-vitales', datos)).data;
   },
 
-  // ---------- Notas ----------
   async listarNotas(pacienteId: number) {
     return (await httpClient.get<NotaEnfermeria[]>('/enfermeria/notas', { params: { pacienteId } })).data;
   },
@@ -24,7 +22,6 @@ export const enfermeriaService = {
     await httpClient.post('/enfermeria/notas', { pacienteId, texto });
   },
 
-  // ---------- Medicación ----------
   async listarMedicacion() {
     return (await httpClient.get<Dosis[]>('/enfermeria/medicacion')).data;
   },
@@ -42,7 +39,6 @@ export const enfermeriaService = {
     await httpClient.post('/enfermeria/indicaciones', datos);
   },
 
-  // ---------- Protocolos ----------
   async listarProtocolos() {
     return (await httpClient.get<Protocolo[]>('/enfermeria/protocolos')).data;
   },

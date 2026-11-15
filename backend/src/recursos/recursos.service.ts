@@ -13,7 +13,6 @@ import type { AsignarCamaDto } from './dto/recursos.dto.js';
 import { Cama, Internacion } from './entities/camas.entities.js';
 import { AccionCama, EstadoCama, siguienteEstadoCama } from './maquina-estados-cama.js';
 
-/** Servicio de camas e internaciones. */
 @Injectable()
 export class RecursosService {
   constructor(
@@ -24,11 +23,6 @@ export class RecursosService {
     private readonly eventos: EventEmitter2,
   ) {}
 
-  // =====================================================================
-  // MAPA DE CAMAS
-  // =====================================================================
-
-  /** Todas las camas con su habitación y, si está ocupada, el paciente internado. */
   async obtenerMapaDeCamas() {
     const [camas, activas] = await Promise.all([
       this.camas.find({ relations: { habitacion: true }, order: { codigo: 'ASC' } }),
@@ -48,7 +42,6 @@ export class RecursosService {
     });
   }
 
-  /** Historial completo de ocupación de camas. */
   listarHistorial(): Promise<Internacion[]> {
     return this.internaciones.find({
       relations: { paciente: true, cama: { habitacion: true } },
@@ -57,7 +50,6 @@ export class RecursosService {
     });
   }
 
-  /** La usa Enfermería: valida que la internación exista y siga abierta. */
   async obtenerInternacionActiva(id: number): Promise<Internacion> {
     const internacion = await this.internaciones.findOne({
       where: { id, fechaEgreso: IsNull() },
@@ -67,17 +59,12 @@ export class RecursosService {
     return internacion;
   }
 
-  /** La usa Enfermería: internación activa de un paciente (o null si no está internado). */
   buscarInternacionActivaDePaciente(pacienteId: number): Promise<Internacion | null> {
     return this.internaciones.findOne({
       where: { pacienteId, fechaEgreso: IsNull() },
       relations: { cama: { habitacion: true } },
     });
   }
-
-  // =====================================================================
-  // HU 1.1 - ASIGNACIÓN SEGURA DE CAMA (bloqueo optimista)
-  // =====================================================================
 
   async asignarCama(camaId: number, dto: AsignarCamaDto): Promise<Internacion> {
     await this.hce.obtenerPaciente(dto.pacienteId);
@@ -86,17 +73,14 @@ export class RecursosService {
       throw new ConflictException('El paciente ya se encuentra internado en otra cama.');
     }
 
-    // 1) Se LEE la cama sin bloquear nada. Nos guardamos su número de versión.
     const cama = await this.buscarCama(camaId);
     if (cama.estado === EstadoCama.Ocupada) {
       throw new ConflictException(`La cama ${cama.codigo} acaba de ser ocupada.`);
     }
 
     const internacionId = await this.dataSource.transaction(async (manager) => {
-      // 2) Se intenta el cambio de estado "si nadie tocó la cama desde que la leí".
       await this.cambiarEstado(manager, cama, AccionCama.AsignarPaciente);
 
-      // 3) Se persiste la relación Paciente + Cama + marca temporal de ingreso.
       const internacion = await manager.save(
         manager.create(Internacion, {
           camaId: cama.id,
@@ -109,8 +93,6 @@ export class RecursosService {
       return internacion.id;
     });
 
-    // Evento de ingreso: lo escuchan Enfermería (arma el protocolo con el
-    // Builder) y Facturación (abre la cuenta de gastos de la estadía).
     const evento: InternacionIniciadaEvento = {
       internacionId,
       pacienteId: dto.pacienteId,
@@ -123,11 +105,6 @@ export class RecursosService {
     return this.obtenerInternacionActiva(internacionId);
   }
 
-  // =====================================================================
-  // HU 2.1 - ALTA, LIMPIEZA Y MANTENIMIENTO (máquina de estados)
-  // =====================================================================
-
-  /** Alta médica: cierra la internación y la cama pasa SOLA a "En limpieza". */
   async darDeAlta(internacionId: number): Promise<Internacion> {
     const internacion = await this.obtenerInternacionActiva(internacionId);
     const cama = await this.buscarCama(internacion.camaId);
@@ -150,7 +127,6 @@ export class RecursosService {
     }))!;
   }
 
-  /** Acciones manuales sobre una cama: confirmar limpieza, bloquear, desbloquear. */
   async aplicarAccion(camaId: number, accion: AccionCama): Promise<Cama> {
     const cama = await this.buscarCama(camaId);
     const estadoAnterior = cama.estado;
@@ -161,24 +137,6 @@ export class RecursosService {
     return this.buscarCama(camaId);
   }
 
-  // =====================================================================
-  // Auxiliares
-  // =====================================================================
-
-  /**
-   * Cambia el estado de una cama aplicando DOS protecciones:
-   *
-   * a) Máquina de estados: valida que la acción esté permitida desde el
-   *    estado actual (ej. no se puede asignar una cama "En limpieza").
-   *
-   * b) BLOQUEO OPTIMISTA: el UPDATE lleva la condición "AND version = X",
-   *    donde X es la versión que se leyó antes. Si otro usuario modificó
-   *    la cama en el medio, su versión ya es X+1, el UPDATE no encuentra
-   *    ninguna fila (affected = 0) y sabemos que perdimos la carrera.
-   *
-   *    UPDATE camas SET estado = @nuevo, version = version + 1
-   *    WHERE id = @id AND version = @versionLeida
-   */
   private async cambiarEstado(
     manager: EntityManager,
     cama: Cama,
@@ -203,7 +161,6 @@ export class RecursosService {
     return estadoNuevo;
   }
 
-  /** Publica el evento que actualiza en tiempo real los monitores de administración. */
   private publicarCambio(cama: Cama, estadoAnterior: EstadoCama, estadoNuevo: EstadoCama): void {
     const evento: CamaEstadoCambiadoEvento = {
       camaId: cama.id,
